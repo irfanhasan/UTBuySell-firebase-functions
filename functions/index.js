@@ -5,29 +5,21 @@ const admin = require('firebase-admin');
 admin.initializeApp(functions.config().firebase);
 
 /**
- * Triggers when a user gets a new follower and sends a notification.
+ * Triggers when a new message is added to the database.
  *
- * Followers add a flag to `/followers/{followedUid}/{followerUid}`.
- * Users save their device notification tokens to `/users/{followedUid}/notificationTokens/{notificationToken}`.
+ * Messages added to '/chats/{chatKey}/messages'
+ * Users save their device notification tokens to `/users/{Uid]/token.
  */
 exports.sendMessageNotification = functions.database.ref('/chats/{chatKey}/messages').onWrite(event => {
 	const chatKey = event.params.chatKey;
-//	// If un-follow we exit the function.
-//	if (!event.data.val()) {
-//		return console.log('User ', followerUid, 'un-followed user', followedUid);
-//	}
+
 	console.log('New message sent to chat:', chatKey);
 
-	// Get the list of device notification tokens.
+	// Get the last sent message
 	var path = 'chats/' + chatKey + '/messages';
 	console.log('Sending query to', path);
 	const getMessagesPromise = admin.database().ref(path).limitToLast(1).once('value');
 	
-	
-
-	// Get the follower profile.
-	// const getFollowerProfilePromise = admin.auth().getUser(followerUid);
-
 	return Promise.all([getMessagesPromise]).then(results => {
 		const messageSnapshot = results[0];
 		const message = messageSnapshot.val();
