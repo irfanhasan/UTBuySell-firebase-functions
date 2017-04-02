@@ -46,7 +46,8 @@ exports.sendMessageNotification = functions.database.ref('/chats/{chatKey}/messa
 			const payload = {
 				notification: {
 					title: `${senderName} sent you a message.`,
-					body: `${messageBody}`,
+					chatId: `${chatKey}`,
+					body: `${messageBody}`
 				}
 			};
 			console.log("Payload", payload, "sent to token:", token);
